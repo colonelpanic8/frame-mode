@@ -1,0 +1,14 @@
+[[http://melpa.org/#/flimenu][file:http://melpa.org/packages/frame-mode-badge.svg]]
+* frame-mode
+~frame-mode~ configures ~display-buffer-alist~ so that calls to display-buffer that result in a buffer being displayed somewhere that does not replace the current buffer always use a different frame instead of using a different window
+* Installation
+Install from MELPA (coming soon) with ~M-x package-install frame-mode~. See the [[https://github.com/milkypostman/melpa][melpa repository]] for details about how to set up MELPA if you have not already done so.
+* Configuration
+#+BEGIN_SRC emacs-lisp
+(use-package frame-mode
+  :demand t
+  :config
+  (progn
+    (frame-mode +1)
+    (frame-keys-mode +1)))
+#+END_SRC

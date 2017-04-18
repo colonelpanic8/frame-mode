@@ -1,4 +1,4 @@
-;;; frame-mode.el --- Frames mode -*- lexical-binding: t; -*-
+;;; frame-mode.el --- Use frames instead of windows -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2017 Ivan Malison
 
@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; This package provides functions to flatten an imenu index.
+;; Use frames instead of windows whenever display-buffer is called.
 
 ;;; Code:
 
