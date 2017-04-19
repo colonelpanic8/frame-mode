@@ -6,7 +6,7 @@
 ;; Keywords: frames
 ;; URL: https://github.com/IvanMalison/frame-mode
 ;; Version: 0.0.0
-;; Package-Requires: ((s "1.9.0") (emacs "24.4") (cl-lib "0.5") (dash "2.12.0"))
+;; Package-Requires: ((s "1.9.0") (emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -71,8 +71,8 @@ displayed using frames intead of windows."
   (if frame-mode
       (progn (unless (member frame-mode-display-buffer-alist-entry
                              display-buffer-alist)
-               (setq display-buffer-alist (cons frame-mode-display-buffer-alist-entry
-                                                display-buffer-alist)))
+               (push frame-mode-display-buffer-alist-entry
+                     display-buffer-alist))
              (unless pop-up-frames
                (setq pop-up-frames 'graphic-only)))
     (setq pop-up-frames nil)))
