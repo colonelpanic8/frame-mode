@@ -1,4 +1,4 @@
-[[http://melpa.org/#/flimenu][file:http://melpa.org/packages/frame-mode-badge.svg]]
+[[http://melpa.org/#/frame-mode][file:http://melpa.org/packages/frame-mode-badge.svg]]
 * frame-mode
 ~frame-mode~ configures ~display-buffer-alist~ so that calls to display-buffer that result in a buffer being displayed somewhere that does not replace the current buffer always use a different frame instead of using a different window
 * Installation
