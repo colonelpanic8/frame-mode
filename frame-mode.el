@@ -136,8 +136,8 @@ displayed using frames intead of windows."
  ;; XXX: helm and popup go first here because its unlikely someone would want to
  ;; control where those buffers show up. This avoids unintentionally
  ;; deactivating the effect of `frame-mode-other-window-or-frame-next-command'.
- '(("\\*helm.*" . (display-buffer-same-window display-buffer-pop-up-window))
-   (".*popup\*" . (display-buffer-pop-up-window))
+ '(("\\*helm.*" . ((display-buffer-same-window display-buffer-pop-up-window)))
+   (".*popup\*" . ((display-buffer-pop-up-window)))
    (frame-mode-should-use-other-frame-or-window .
     ((frame-mode-force-display-buffer-use-some-frame
       frame-mode-force-display-buffer-pop-up-frame) .
