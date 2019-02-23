@@ -69,12 +69,10 @@ displayed using frames intead of windows."
   :group 'frame-mode
   :require 'frame-mode
   (if frame-mode
-      (progn (unless (member frame-mode-display-buffer-alist-entry
-                             display-buffer-alist)
-               (push frame-mode-display-buffer-alist-entry
-                     display-buffer-alist))
-             (unless pop-up-frames
-               (setq pop-up-frames 'graphic-only)))
+      (progn
+        (advice-add 'display-buffer :around 'frame-mode-around-display-buffer)
+        (unless pop-up-frames
+          (setq pop-up-frames 'graphic-only)))
     (setq pop-up-frames nil)))
 
 (defcustom frame-mode-is-frame-viewable-fn
@@ -143,7 +141,7 @@ displayed using frames intead of windows."
       frame-mode-force-display-buffer-pop-up-frame) .
       ((inhibit-same-window . t)
        (reusable-frames . t))))
-   ("\\*flycheck errors\\*" .
+   ("\\*\\[Ff\\]lycheck errors\\*" .
     ((display-buffer-use-some-frame
       display-buffer-pop-up-frame) .
       ((inhibit-same-window . t)
@@ -155,7 +153,8 @@ displayed using frames intead of windows."
       (inhibit-same-window . t))))
    ("\\*register preview\\*" . ((display-buffer-pop-up-window)))
    (".*" .
-    ((display-buffer-same-window
+    ((display-buffer-reuse-window
+      display-buffer-same-window
       display-buffer-use-some-frame
       display-buffer-pop-up-frame) .
      ((reusable-frames . t)
@@ -164,16 +163,11 @@ displayed using frames intead of windows."
 (defun frame-mode-enabled (&rest _args)
   frame-mode)
 
-(defun frame-mode-display-buffer (buffer alist)
-  (cl-destructuring-bind
-      (functions . additional-alist)
-      (display-buffer-assq-regexp (buffer-name buffer)
-                                  frame-mode-display-buffer-alist
-                                  alist)
-    (let ((full-alist (append alist additional-alist)))
-      (cl-loop for fn in functions
-               for result = (funcall fn buffer full-alist)
-               when result return result))))
+(defun frame-mode-around-display-buffer (fn &rest args)
+  (let* ((target-alist (if frame-mode frame-mode-display-buffer-alist
+                         display-buffer-alist))
+        (display-buffer-alist target-alist))
+    (apply fn args)))
 
 ;;;###autoload
 (defun frame-mode-other-window (count)
