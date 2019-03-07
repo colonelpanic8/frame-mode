@@ -84,9 +84,13 @@ displayed using frames intead of windows."
   (funcall frame-mode-is-frame-viewable-fn frame))
 
 (defun frame-mode-default-is-frame-viewable-fn (frame)
-  (s-contains-p "IsViewable"
-                (shell-command-to-string
-                 (format "xwininfo -id %s" (frame-parameter frame 'window-id)))))
+  (if (executable-find "xwininfo")
+      (s-contains-p "IsViewable"
+                    (shell-command-to-string
+                     (format "xwininfo -id %s" (frame-parameter frame 'window-id))))
+    (progn
+      (message "xwininfo is not on path, not checking if display frame is actually visible.")
+      t)))
 
 (defun frame-mode-display-some-frame-predicate (frame)
   (and
