@@ -56,9 +56,6 @@ commands that do similar things with frames."
   :group 'frame-mode
   :require 'frame-mode)
 
-(defvar frame-mode-display-buffer-alist-entry
-  '(frame-mode-enabled . ((frame-mode-display-buffer . ()))))
-
 ;;;###autoload
 (define-minor-mode frame-mode
   "Minor mode that uses `display-buffer-alist' to ensure that buffers are
@@ -114,28 +111,16 @@ displayed using frames intead of windows."
 
 
 ;; These variables are for internal use by `frame-only-mode' only.
-(defvar frame-mode-use-new-frame-or-window nil)
-(defvar frame-mode-use-new-frame-or-window-next-command nil)
-(defmacro frame-mode-force-use-new-frame (&rest forms)
-  `(let ((frame-mode-use-new-frame-or-window t))
-     ,@forms))
+(defvar frame-mode-use-other-frame-or-window-by-default nil)
+(defvar frame-mode-flip-other-frame-behavior nil)
 
 (defun frame-mode-should-use-other-frame-or-window (&rest _args)
-  (and frame-mode
-       (or frame-mode-use-new-frame-or-window-next-command
-           frame-mode-use-new-frame-or-window)))
-
-(defun frame-mode-force-display-buffer-pop-up-frame (&rest args)
-  (let ((res (apply 'display-buffer-pop-up-frame args)))
-    (when res
-      (setq frame-mode-use-new-frame-or-window-next-command nil))
-    res))
-
-(defun frame-mode-force-display-buffer-use-some-frame (&rest args)
-  (let ((res (apply 'display-buffer-use-some-frame args)))
-    (when res
-      (setq frame-mode-use-new-frame-or-window-next-command nil))
-    res))
+  (let ((result (not
+                 (eq frame-mode-use-other-frame-or-window-by-default
+                     frame-mode-flip-other-frame-behavior))))
+    (when frame-mode-flip-other-frame-behavior
+      (setq frame-mode-flip-other-frame-behavior nil))
+    result))
 
 
 
@@ -146,11 +131,6 @@ displayed using frames intead of windows."
  '(("\\*helm.*" . ((display-buffer-same-window display-buffer-pop-up-window)))
    (".*popup\*" . ((display-buffer-pop-up-window)))
    ("\\*Org todo\\*" . ((display-buffer-same-window)))
-   (frame-mode-should-use-other-frame-or-window .
-    ((frame-mode-force-display-buffer-use-some-frame
-      frame-mode-force-display-buffer-pop-up-frame) .
-      ((inhibit-same-window . t)
-       (reusable-frames . t))))
    ("\\*[Ff]lycheck error.*" .
     ((frame-mode-reuse-some-visible-window
       display-buffer-use-some-frame
@@ -164,6 +144,11 @@ displayed using frames intead of windows."
       (inhibit-switch-frame . t)
       (inhibit-same-window . t))))
    ("\\*register preview\\*" . ((display-buffer-pop-up-window)))
+   (frame-mode-should-use-other-frame-or-window .
+    ((frame-mode-force-display-buffer-use-some-frame
+      frame-mode-force-display-buffer-pop-up-frame) .
+      ((inhibit-same-window . t)
+       (reusable-frames . visible))))
    (".*" .
     ((frame-mode-reuse-some-visible-window
       display-buffer-same-window
@@ -172,14 +157,18 @@ displayed using frames intead of windows."
      ((reusable-frames . visible)
       (frame-predicate . frame-mode-display-some-frame-predicate))))))
 
-(defun frame-mode-enabled (&rest _args)
-  frame-mode)
-
 (defun frame-mode-around-display-buffer (fn &rest args)
   (let* ((target-alist (if frame-mode frame-mode-display-buffer-alist
                          display-buffer-alist))
          (display-buffer-alist target-alist))
     (apply fn args)))
+
+(defun frame-mode-around-use-new-window (fn &rest args)
+  (let* ((frame-mode-use-other-frame-or-window-by-default t))
+    (apply fn args)))
+
+(defun frame-mode-always-use-other-frame-for (fn)
+  (advice-add fn :around 'frame-mode-around-use-new-window))
 
 ;;;###autoload
 (defun frame-mode-other-window (count)
@@ -195,10 +184,10 @@ COUNT determines the number of windows to move over."
 (defun frame-mode-other-window-or-frame-next-command ()
   "Use a new frame no matter what when the next call to `display-buffer' occurs."
   (interactive)
-  (setq frame-mode-use-new-frame-or-window-next-command
-        (not frame-mode-use-new-frame-or-window-next-command))
+  (setq frame-mode-flip-other-frame-behavior
+        (not frame-mode-use-other-frame-or-window-next-command))
   (message "using other frame: %s"
-           frame-mode-use-new-frame-or-window-next-command))
+           frame-mode-flip-other-frame-behavior))
 
 (provide 'frame-mode)
 ;;; frame-mode.el ends here
