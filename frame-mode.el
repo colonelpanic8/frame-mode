@@ -97,6 +97,11 @@ displayed using frames intead of windows."
           (frame-first-window frame))))
    (frame-mode-is-frame-viewable frame)))
 
+(defun frame-mode-reuse-some-visible-window (buffer alist)
+  (cl-loop for window in (get-buffer-window-list buffer)
+           for frame = (window-frame window)
+           when (frame-mode-is-frame-viewable frame) return window))
+
 (defcustom frame-mode-is-frame-viewable-fn
   'frame-mode-default-is-frame-viewable-fn
   "Predicate that determines whether a frame can be used to pop up a buffer."
@@ -142,11 +147,13 @@ displayed using frames intead of windows."
       frame-mode-force-display-buffer-pop-up-frame) .
       ((inhibit-same-window . t)
        (reusable-frames . t))))
-   ("\\*\\[Ff\\]lycheck errors\\*" .
-    ((display-buffer-use-some-frame
+   ("\\*[Ff]lycheck error.*" .
+    ((frame-mode-reuse-some-visible-window
+      display-buffer-use-some-frame
       display-buffer-pop-up-frame) .
       ((inhibit-same-window . t)
-       (frame-predicate . frame-mode-display-some-frame-predicate))))
+       (frame-predicate . frame-mode-display-some-frame-predicate)
+       (resuable-frame . visible))))
    (".*magit-diff.*" .
     ((display-buffer-pop-up-window) .
      ((reusable-frames . 0)
@@ -154,11 +161,11 @@ displayed using frames intead of windows."
       (inhibit-same-window . t))))
    ("\\*register preview\\*" . ((display-buffer-pop-up-window)))
    (".*" .
-    ((display-buffer-reuse-window
+    ((frame-mode-reuse-some-visible-window
       display-buffer-same-window
       display-buffer-use-some-frame
       display-buffer-pop-up-frame) .
-     ((reusable-frames . t)
+     ((reusable-frames . visible)
       (frame-predicate . frame-mode-display-some-frame-predicate))))))
 
 (defun frame-mode-enabled (&rest _args)
@@ -167,7 +174,7 @@ displayed using frames intead of windows."
 (defun frame-mode-around-display-buffer (fn &rest args)
   (let* ((target-alist (if frame-mode frame-mode-display-buffer-alist
                          display-buffer-alist))
-        (display-buffer-alist target-alist))
+         (display-buffer-alist target-alist))
     (apply fn args)))
 
 ;;;###autoload
