@@ -131,7 +131,6 @@ displayed using frames intead of windows."
  '(("\\*helm.*" . ((display-buffer-same-window display-buffer-pop-up-window)))
    (".*popup\*" . ((display-buffer-pop-up-window)))
    (".*\\*transient\\*.*" . ((display-buffer-in-side-window)))
-   (".*magit: transient.*" . ((display-buffer-in-side-window)))
    ("\\*Completions.\\*" . (display-buffer-same-window))
    ("\\*Org todo\\*" . ((display-buffer-same-window)))
    ("\\*[Ff]lycheck error.*" .
