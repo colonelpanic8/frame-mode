@@ -130,6 +130,7 @@ displayed using frames intead of windows."
  ;; deactivating the effect of `frame-mode-other-window-or-frame-next-command'.
  '(("\\*helm.*" . ((display-buffer-same-window display-buffer-pop-up-window)))
    (".*popup\*" . ((display-buffer-pop-up-window)))
+   ("\\*Org Note\\*" . ((display-buffer-pop-up-window)))
    (".*\\*transient\\*.*" . ((display-buffer-in-side-window)))
    ("\\*Completions.\\*" . (display-buffer-same-window))
    ("\\*Org todo\\*" . ((display-buffer-same-window)))
