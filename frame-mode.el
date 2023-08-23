@@ -35,7 +35,7 @@
   :group 'frame-mode
   :prefix "frame-mode-")
 
-(defvar frame-mode-keymap
+(defvar frame-keys-mode-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x 3") 'make-frame)
     (define-key map (kbd "C-x 2") 'make-frame)
@@ -51,7 +51,7 @@
   "Minor mode that replaces familiar window manipulation key bindings with
 commands that do similar things with frames."
   :lighter nil
-  :keymap frame-mode-keymap
+  :keymap frame-keys-mode-keymap
   :global t
   :group 'frame-mode
   :require 'frame-mode)
@@ -130,10 +130,13 @@ displayed using frames intead of windows."
  ;; deactivating the effect of `frame-mode-other-window-or-frame-next-command'.
  '(("\\*helm.*" . ((display-buffer-same-window display-buffer-pop-up-window)))
    (".*popup\*" . ((display-buffer-pop-up-window)))
+   ("\\*Agenda Commands\\*" . ((display-buffer-pop-up-window)))
+   ("\\*Org Agenda\\*" . (display-buffer-full-frame))
+   ("\\*Org Select\\*" . ((display-buffer-pop-up-window)))
+   ("\\*Org todo\\*" . ((display-buffer-same-window)))
    ("\\*Org Note\\*" . ((display-buffer-pop-up-window)))
    (".*\\*transient\\*.*" . ((display-buffer-in-side-window)))
    ("\\*Completions.\\*" . (display-buffer-same-window))
-   ("\\*Org todo\\*" . ((display-buffer-same-window)))
    ("\\*[Ff]lycheck error.*" .
     ((frame-mode-reuse-some-visible-window
       display-buffer-use-some-frame
