@@ -135,8 +135,11 @@ displayed using frames intead of windows."
    ("\\*Org Select\\*" . ((display-buffer-pop-up-window)))
    ("\\*Org todo\\*" . ((display-buffer-same-window)))
    ("\\*Org Note\\*" . ((display-buffer-pop-up-window)))
+   ("\\*Calendar\\*" . ((display-buffer-same-window)))
    (".*\\*transient\\*.*" . ((display-buffer-in-side-window)))
    ("\\*Completions.\\*" . (display-buffer-same-window))
+   ("\\*Capture\\*" . (display-buffer-same-window))
+   ("CAPTURE.*\\.org" . (display-buffer-same-window))
    ("\\*[Ff]lycheck error.*" .
     ((frame-mode-reuse-some-visible-window
       display-buffer-use-some-frame
