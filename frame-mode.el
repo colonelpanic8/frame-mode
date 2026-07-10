@@ -166,11 +166,37 @@ displayed using frames intead of windows."
      ((reusable-frames . visible)
       (frame-predicate . frame-mode-display-some-frame-predicate))))))
 
-(defun frame-mode-around-display-buffer (fn &rest args)
+(defcustom frame-mode-override-action-buffer-name-regexps
+  '("\\`\\*Capture\\*\\'" "\\`CAPTURE.*\\.org\\'")
+  "Buffer name regexps whose frame-mode rules override explicit actions.
+
+Some callers explicitly request another window even for temporary buffers.
+That action takes precedence over `display-buffer-alist' and, when
+`pop-up-frames' is non-nil, can leak a new frame out of a
+`save-window-excursion'.  Buffers listed here instead use the matching action
+from `frame-mode-display-buffer-alist'."
+  :type '(repeat regexp))
+
+(defun frame-mode-buffer-overrides-action-p (buffer-or-name)
+  "Return non-nil when BUFFER-OR-NAME should ignore an explicit action."
+  (let ((name (if (bufferp buffer-or-name)
+                  (buffer-name buffer-or-name)
+                buffer-or-name)))
+    (and name
+         (cl-some (lambda (regexp) (string-match-p regexp name))
+                  frame-mode-override-action-buffer-name-regexps))))
+
+(defun frame-mode-around-display-buffer
+    (fn buffer-or-name &optional action frame)
   (let* ((target-alist (if frame-mode frame-mode-display-buffer-alist
                          display-buffer-alist))
-         (display-buffer-alist target-alist))
-    (apply fn args)))
+         (display-buffer-alist target-alist)
+         (target-action
+          (if (and frame-mode
+                   (frame-mode-buffer-overrides-action-p buffer-or-name))
+              nil
+            action)))
+    (funcall fn buffer-or-name target-action frame)))
 
 (defun frame-mode-around-use-new-window (fn &rest args)
   (let* ((frame-mode-use-other-frame-or-window-by-default t))
